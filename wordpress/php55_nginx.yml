@@ -20,7 +20,6 @@ vagrant:
       virtualbox:
         modifyvm:
           name: protobox
-          natdnshostresolver1: 'on'
           memory: '1024'
         setextradata:
           VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root: 1
@@ -54,7 +53,7 @@ vagrant:
     host: ':detect'
 
 server:
-  packages: { }
+  packages: [ ]
 
 nginx:
   install: 1
@@ -99,10 +98,10 @@ php:
     - php5-gd
   pear:
     install: 0
-    modules: { }
+    modules: [ ]
   pecl:
     install: 0
-    modules: { }
+    modules: [ ]
   composer: 
     install: 1
   mailcatcher: 
