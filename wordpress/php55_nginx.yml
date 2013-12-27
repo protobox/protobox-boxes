@@ -184,7 +184,6 @@ applications:
       options:
         version: '3.8'
         method: zip
-      settings:
         dbhost: localhost
         dbname: wordpress
         dbuser: root
