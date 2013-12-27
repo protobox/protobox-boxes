@@ -1,0 +1,192 @@
+---
+protobox:
+  version: 0.0.1
+  document: 'wordpress_php55_nginx'
+  name: 'Wordpress - PHP 5.5 + Nginx'
+  description: 'Wordpress Box with PHP 5.5 + Nginx + Dev Tools'
+
+vagrant:
+  vm:
+    box: precise64
+    box_url: 'http://files.vagrantup.com/precise64.box'
+    hostname: protobox
+    network:
+      private_network: 192.168.5.10
+      forwarded_port:
+        web:
+          host: ''
+          guest: ''
+    provider:
+      virtualbox:
+        modifyvm:
+          name: protobox
+          natdnshostresolver1: 'on'
+          memory: '1024'
+        setextradata:
+          VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root: 1
+    provision:
+      ansible:
+        playbook: "ansible/site.yml"
+    synced_folder:
+      root:
+        id: vagrant-root
+        source: ./
+        target: /srv/www
+        nfs: true
+        owner: vagrant
+        group: www-data
+        mount_options: 
+          - 'dmode=775'
+          - 'fmode=775'
+    usable_port_range: 2200..2250
+  ssh:
+    host: null
+    port: null
+    private_key_path: null
+    public_key_path: null
+    username: vagrant
+    guest_port: null
+    keep_alive: true
+    forward_agent: false
+    forward_x11: false
+    shell: 'bash -l'
+  vagrant:
+    host: ':detect'
+
+server:
+  packages: { }
+
+nginx:
+  install: 1
+  mpm_module: fpm
+  vhosts:
+    - name: protobox
+      server_name: protobox.dev
+      server_aliases:
+        - www.protobox.dev
+      www_root: /srv/www/web/protobox
+      listen_port: '80'
+      index_files:
+        - index.html
+        - index.htm
+        - index.php
+      envvars:
+        - 'APP_ENV dev'
+    - name: wordpress
+      server_name: wordpress.dev
+      server_aliases:
+        - www.wordpress.dev
+      www_root: /srv/www/web/wordpress
+      listen_port: '80'
+      index_files:
+        - index.html
+        - index.htm
+        - index.php
+      envvars:
+        - 'APP_ENV dev'
+
+hhvm:
+  install: 0
+
+php:
+  install: 1
+  version: '55'
+  modules:
+    - php5-cli
+    - php5-intl
+    - php5-mcrypt
+    - php5-curl
+    - php5-gd
+  pear:
+    install: 0
+    modules: { }
+  pecl:
+    install: 0
+    modules: { }
+  composer: 
+    install: 1
+  mailcatcher: 
+    install: 1
+  phpmyadmin:
+    install: 0
+  xdebug:
+    install: 1
+    webgrind: 1
+    settings:
+      default_enable: '1'
+      remote_autostart: '0'
+      remote_connect_back: '1'
+      remote_enable: '1'
+      remote_handler: dbgp
+      remote_port: '9000'
+  xhprof:
+    install: 0
+    xhgui: 1
+    location: /srv/www/web/xhprof
+  ini:
+    display_errors: 'On'
+    display_startup_errors: 'On'
+    error_reporting: '-1'
+    short_open_tag: 'On'
+  timezone: America/Chicago
+
+mysql:
+  install: 1
+  root_password: 'root'
+  databases:
+    - name: app
+      host: localhost
+      user: user
+      password: user
+      grant:
+        - ALL
+      sql_file: ''
+    - name: wordpress
+      host: localhost
+      user: user
+      password: user
+      grant:
+          - ALL
+
+node:
+  install: 1
+  npm:
+    - grunt
+    - grunt-cli
+    - bower
+  gems:
+    - sass
+    - compass
+
+localtunnel:
+  install: 1
+  ngrok:
+    install: 1
+    port: 80
+    #subdomain: protoboxapp
+    #httpauth: 'user:password'
+    #proto: 'tcp 22'
+    #client: 'client1 client2 client3'
+    #hostname: 'your.domain.com'
+    #tunnels:
+    #  client:
+    #    httpauth: 'user:password'
+    #    proto: 'https 8080'
+    #  ssh:
+    #    proto: 'tcp: 22'
+
+applications:
+  install: 1
+  wordpress:
+    - name: wordpress
+      install: 1
+      path: /srv/www/web/wordpress
+      options:
+        version: '3.8'
+        method: zip
+      settings:
+        dbhost: localhost
+        dbname: wordpress
+        dbuser: root
+        dbpass: root
+
